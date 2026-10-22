@@ -87,15 +87,15 @@
   }
   
   .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px 15px; align-content: start; }
-  .app-icon { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; transition: transform 0.1s; }
+  .app-icon { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 6px; cursor: pointer; transition: transform 0.1s; }
   .app-icon:active { transform: scale(0.85); opacity: 0.8; }
   .app-icon .icon { 
     width: 60px; height: 60px; border-radius: 14px; 
     display: flex; align-items: center; justify-content: center; 
     font-size: 32px; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
-    overflow: hidden; position: relative;
+    overflow: hidden; position: relative; flex-shrink: 0;
   }
-  .app-icon .label { font-size: 11px; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.6); }
+  .app-icon .label { font-size: 11px; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.6); white-space: nowrap; }
 
   /* 角标 */
   .badge {
@@ -107,18 +107,19 @@
   /* 桌面上的日历 Widget */
   .widget-calendar {
     grid-column: span 2; grid-row: span 2;
-    background: #fff; border-radius: 20px; padding: 15px;
+    background: #fff; border-radius: 20px; padding: 12px;
     display: flex; flex-direction: column; cursor: pointer;
     box-shadow: 0 4px 15px rgba(0,0,0,0.15); color: #000;
+    width: 100%; height: 100%; box-sizing: border-box;
+    aspect-ratio: 1 / 1;
   }
-  .wc-header { color: #ff3b30; font-weight: 600; font-size: 13px; }
-  .wc-date { font-size: 42px; font-weight: 300; line-height: 1; margin-top: 2px; margin-bottom: auto;}
-  .wc-event { display: flex; align-items: stretch; gap: 8px; margin-top: 8px; }
-  .wc-event-bar { width: 3px; background: #af52de; border-radius: 2px; }
-  .wc-event-info { display: flex; flex-direction: column; }
-  .wc-event-title { font-size: 13px; font-weight: 500; line-height: 1.2; margin-bottom: 2px; }
-  .wc-event-time { font-size: 11px; color: #8e8e93; }
-  
+  .wc-title { color: #ff3b30; font-weight: 700; font-size: 15px; margin-bottom: 8px; }
+  .wc-mini-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px 0; text-align: center; flex: 1; }
+  .wc-mini-grid span { font-size: 12px; display: flex; align-items: center; justify-content: center; width: 100%; }
+  .wc-mini-grid .header { color: #8e8e93; font-size: 10px; }
+  .wc-mini-grid .sun { color: #ff3b30; }
+  .wc-mini-grid .today { background: #ff3b30; color: #fff; border-radius: 50%; width: 20px; height: 20px; margin: 0 auto; }
+
   /* 底部 Dock 栏 */
   .dock { 
     position: absolute; bottom: 20px; left: 15px; right: 15px; height: 85px; 
@@ -143,6 +144,28 @@
   .css-weather-icon .cloud-left { position: absolute; bottom: 10px; left: 10px; width: 22px; height: 22px; background: #FFF; border-radius: 50%; }
   .css-weather-icon .cloud-fill { position: absolute; bottom: 10px; left: 21px; width: 15px; height: 22px; background: #FFF; }
 
+  /* 顶部通知横幅 */
+  .notification-banner {
+    position: absolute; top: -100px; left: 10px; right: 10px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+    border-radius: 20px; padding: 12px 16px;
+    display: flex; align-items: center; gap: 12px;
+    z-index: 100000;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    transition: top 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    cursor: pointer;
+  }
+  .notification-banner.show { top: 50px; }
+  .notif-icon { position: relative; width: 38px; height: 38px; flex-shrink: 0; }
+  .notif-icon img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+  .notif-app-icon { position: absolute; bottom: -2px; right: -2px; background: #fee500; border-radius: 6px; padding: 1px; font-size: 10px; border: 1px solid #fff; }
+  .notif-content { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+  .notif-header { display: flex; justify-content: space-between; align-items: center; }
+  .notif-title { font-weight: 600; font-size: 14px; color: #000; }
+  .notif-time { font-size: 12px; color: #8e8e93; }
+  .notif-body { font-size: 14px; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
   /* ================= App 页面通用 ================= */
   .app-page {
     position: absolute; inset: 0; z-index: 300;
@@ -156,8 +179,60 @@
   .status-left.hidden { opacity: 0; }
 
   /* ================= 电话 App ================= */
-  .phone-app { background: #fff; color: #000; }
+  .phone-app { background: #1c1c1e; color: #000; position: relative; width: 100%; height: 100%; }
   .phone-app.active { display: flex; flex-direction: column; }
+  
+  /* 来电页面 */
+  .incoming-call-screen { 
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #1c1c1e; z-index: 100; 
+    display: none; flex-direction: column; align-items: center; color: #fff; padding-top: 100px; 
+  }
+  .incoming-call-screen.active { display: flex; }
+  .incoming-text { font-size: 16px; color: #aaa; margin-bottom: 10px; }
+  .incoming-name { font-size: 34px; font-weight: 300; margin-bottom: 40px; display: flex; align-items: center; gap: 6px; }
+  .incoming-avatar { width: 140px; height: 140px; border-radius: 50%; background: url('photos/avator.jpg') center/cover #333; box-shadow: 0 4px 12px rgba(0,0,0,0.5); margin-bottom: auto; }
+  .incoming-actions { display: flex; justify-content: space-between; width: 100%; padding: 0 60px; margin-bottom: 80px; }
+  .incoming-btn { display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; }
+  .incoming-btn .icon-circle { width: 75px; height: 75px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+  .incoming-btn.decline .icon-circle { background: #ff3b30; }
+  .incoming-btn.answer .icon-circle { background: #4cd964; }
+  .incoming-btn .label { font-size: 14px; color: #fff; }
+  .incoming-btn:active .icon-circle { opacity: 0.7; }
+
+  /* 通话中页面 */
+  .call-screen { 
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+    background: #1c1c1e; z-index: 100; display: none; 
+    flex-direction: column; align-items: center; color: #fff; 
+    padding-top: 80px; padding-bottom: 40px; 
+  }
+  .call-screen.active { display: flex; }
+  .call-avatar { width: 100px; height: 100px; border-radius: 50%; background: url('photos/avator.jpg') center/cover #555; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+  .call-name-display { font-size: 36px; font-weight: 300; margin-bottom: 8px; }
+  .call-timer { font-size: 18px; color: #8e8e93; margin-bottom: 20px; font-weight: 400; letter-spacing: 1px; }
+  
+  .live-caption { 
+    width: 90%; text-align: center; min-height: 60px; 
+    display: flex; flex-direction: column; gap: 4px; 
+    opacity: 0; transition: opacity 0.3s; 
+    margin-bottom: auto; justify-content: center;
+  }
+  .live-caption.show { opacity: 1; }
+  .caption-name { font-size: 13px; color: #aaa; font-weight: 500; }
+  .caption-text { font-size: 20px; color: #fff; line-height: 1.4; }
+  
+  .call-actions-wrap { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 20px; margin-bottom: 20px;}
+  
+  .call-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px 30px; padding: 0 40px; width: 100%; box-sizing: border-box;}
+  .call-btn { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
+  .call-btn .icon-circle { width: 60px; height: 60px; border-radius: 50%; background: #48484a; display: flex; justify-content: center; align-items: center; }
+  .call-btn .label { font-size: 12px; color: #fff; }
+  
+  .call-btn-end { width: 65px; height: 65px; border-radius: 50%; background: #ff3b30; display: flex; justify-content: center; align-items: center; cursor: pointer; margin-top: 5px;}
+  .call-btn-end:active { opacity: 0.7; }
+
+  /* 最近通话列表 */
+  .phone-list-page { display: flex; flex-direction: column; height: 100%; background: #fff; width: 100%; }
   .phone-list-header { padding: 16px 20px 0; background: #fff; z-index: 10; }
   .phone-top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
   .phone-top-bar .back { color: #000; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 2px; }
@@ -180,21 +255,6 @@
   .call-right { display: flex; align-items: center; gap: 12px; }
   .call-time { font-size: 15px; color: #8e8e93; }
   .call-info { color: #007aff; font-size: 20px; }
-  .call-screen { position: absolute; inset: 0; background: #2c2c2e; z-index: 20; display: none; flex-direction: column; align-items: center; color: #fff; padding-top: 80px; }
-  .call-screen.active { display: flex; }
-  .call-avatar { width: 100px; height: 100px; border-radius: 50%; background: url('photos/avator.jpg') center/cover #555; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-  .call-name-display { font-size: 36px; font-weight: 300; margin-bottom: 8px; }
-  .call-timer { font-size: 18px; color: #8e8e93; margin-bottom: 30px; font-weight: 400; letter-spacing: 1px; }
-  .live-caption { width: 90%; background: rgba(255,255,255,0.1); border-radius: 16px; padding: 16px 20px; min-height: 100px; display: flex; flex-direction: column; gap: 8px; opacity: 0; transition: opacity 0.3s; margin-bottom: auto;}
-  .live-caption.show { opacity: 1; }
-  .caption-name { font-size: 12px; color: #8e8e93; font-weight: 500; }
-  .caption-text { font-size: 18px; color: #fff; line-height: 1.4; }
-  .call-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px 40px; margin-bottom: 60px; padding: 0 30px; }
-  .call-btn { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
-  .call-btn .icon-circle { width: 70px; height: 70px; border-radius: 50%; background: #48484a; display: flex; justify-content: center; align-items: center; }
-  .call-btn .label { font-size: 13px; color: #fff; }
-  .call-btn.end-call .icon-circle { background: #ff3b30; }
-  .call-btn:active .icon-circle { opacity: 0.7; }
 
   /* ================= 日历 App ================= */
   .cal-nav-top { padding: 16px 20px 0; display: flex; background: #fff; position: relative; z-index: 10; }
@@ -303,6 +363,12 @@
   .safari-page.active { display: flex; }
   .safari-nav { padding: 16px 20px 0; display: flex; background: #f2f2f7; }
   .safari-nav .back { color: #000; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 2px; }
+  
+  /* 调整后的 Safari 顶部搜索栏 */
+  .safari-top-search { padding: 10px 20px; background: #f2f2f7; }
+  .safari-search-bar { background: #e3e3e8; border-radius: 10px; height: 36px; display: flex; align-items: center; padding: 0 12px; justify-content: center; gap: 8px; cursor: pointer; }
+  .safari-search-bar .search-text { color: #8e8e93; font-size: 15px; }
+
   .safari-home-content { flex: 1; overflow-y: auto; padding: 10px 20px 100px; }
   .safari-section-title { font-size: 22px; font-weight: 700; margin: 15px 0 10px; }
   .safari-favorites { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px 10px; }
@@ -313,12 +379,13 @@
   .safari-privacy .p-icon { font-size: 32px; }
   .safari-privacy .p-text { font-size: 14px; line-height: 1.4; color: #333; }
   .safari-reading-list { background: #fff; border-radius: 12px; padding: 15px; font-size: 15px; color: #8e8e93; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-  .safari-toolbar { position: absolute; bottom: 25px; left: 0; right: 0; height: 60px; background: #f2f2f7; border-top: 0.5px solid #d1d1d6; display: flex; flex-direction: column; justify-content: space-between; padding: 8px 16px; }
-  .safari-search-bar { background: #e3e3e8; border-radius: 10px; height: 36px; display: flex; align-items: center; padding: 0 12px; justify-content: space-between; cursor: pointer; }
-  .safari-search-bar .search-text { color: #8e8e93; font-size: 16px; flex: 1; text-align: center; }
-  .safari-bottom-icons { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding: 0 10px; color: #007aff; }
+  
+  /* 调整后的底部工具栏 */
+  .safari-bottom-bar { position: absolute; bottom: 25px; left: 0; right: 0; height: 50px; background: #f2f2f7; border-top: 0.5px solid #d1d1d6; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
+  .safari-bottom-icons { display: flex; justify-content: space-between; align-items: center; width: 100%; color: #007aff; }
   .safari-bottom-icons svg { width: 24px; height: 24px; fill: currentColor; opacity: 0.5; }
   .safari-bottom-icons svg.active { opacity: 1; }
+  
   .safari-search-header { display: flex; align-items: center; padding: 10px 20px; gap: 10px; background: #f2f2f7; }
   .safari-search-input-wrap { flex: 1; background: #e3e3e8; border-radius: 10px; display: flex; align-items: center; padding: 8px 12px; gap: 6px; }
   .safari-search-input-wrap input { border: none; background: transparent; outline: none; font-size: 16px; width: 100%; }
@@ -344,6 +411,7 @@
   .ig-nav-bar .username-top { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 4px; }
   .ig-nav-bar .top-icons { display: flex; gap: 16px; align-items: center; }
   .ig-nav-bar .top-icons svg { width: 24px; height: 24px; fill: none; stroke: #000; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; cursor: pointer;}
+  
   .ig-profile-content { flex: 1; overflow-y: auto; padding-bottom: 80px; }
   .ig-profile-content::-webkit-scrollbar { display: none; }
   .ig-profile-header { padding: 8px 16px; display: flex; align-items: center; gap: 22px; }
@@ -357,31 +425,46 @@
   .ig-bio b { font-size: 14px; font-weight: 700; display: block; margin-bottom: 2px;}
   .ig-btn-row { display: flex; gap: 6px; padding: 0 16px 16px; }
   .ig-btn-row button { flex: 1; background: #efefef; border-radius: 8px; padding: 8px; font-weight: 600; font-size: 13.5px; border: none; cursor: pointer; }
+  
   .ig-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 0 2px; }
   .ig-grid .ig-post-thumb { aspect-ratio: 1; background: #eee; cursor: pointer; overflow: hidden; }
   .ig-grid .ig-post-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .ig-detail-nav { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 1px solid #efefef; background: #fff;}
-  .ig-detail-nav .back { font-size: 20px; cursor: pointer; width: 24px; }
-  .ig-detail-nav .title { font-size: 16px; font-weight: 700; }
-  .ig-detail-nav .spacer { width: 24px; }
-  .ig-detail-scroll { flex: 1; overflow-y: auto; padding-bottom: 80px; }
-  .ig-post-header { display: flex; align-items: center; gap: 10px; padding: 10px 16px; }
-  .ig-post-header .sm-avatar { width: 32px; height: 32px; border-radius: 50%; background: #6ad587; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1.5px solid transparent; background-clip: padding-box; box-shadow: 0 0 0 1.5px #dc2743;}
-  .ig-post-header .sm-avatar img { width: 100%; height: 100%; object-fit: cover; }
-  .ig-post-header .name { font-weight: 700; font-size: 14px; flex: 1; }
-  .ig-post-header .dots { font-size: 20px; color: #333; font-weight: 700; cursor: pointer;}
+  
+  /* Instagram Feed 页样式 */
+  .ig-feed-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 16px 12px; background: #fff; border-bottom: 1px solid #efefef; }
+  .ig-feed-header .left { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .ig-feed-header .left .sm-avatar { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; }
+  .ig-feed-header .left .sm-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .ig-feed-header .left .name { font-weight: 700; font-size: 16px; }
+  .ig-feed-header .top-icons svg { width: 24px; height: 24px; fill: none; stroke: #000; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; cursor: pointer; }
+  
+  .ig-feed-scroll { flex: 1; overflow-y: auto; padding-bottom: 80px; }
+  .ig-feed-scroll::-webkit-scrollbar { display: none; }
+  
+  .ig-post { border-bottom: 1px solid #efefef; margin-bottom: 5px; }
+  .ig-post-header { display: flex; align-items: center; gap: 10px; padding: 10px 16px; cursor: pointer; }
+  .ig-post-header .sm-avatar { width: 32px; height: 32px; border-radius: 50%; background: #6ad587; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1.5px solid transparent; background-clip: padding-box; box-shadow: 0 0 0 1.5px #dc2743; pointer-events: none;}
+  .ig-post-header .sm-avatar img { width: 100%; height: 100%; object-fit: cover; pointer-events: none;}
+  .ig-post-header .name { font-weight: 700; font-size: 14px; flex: 1; pointer-events: none;}
+  .ig-post-header .dots { font-size: 20px; color: #333; font-weight: 700; cursor: pointer; pointer-events: none;}
   .ig-post-main-img { width: 100%; aspect-ratio: 1; background: #f0f0f0; object-fit: cover; display: block; }
   .ig-post-actions { display: flex; gap: 14px; padding: 12px 16px 8px; align-items: center; }
   .ig-post-actions svg { width: 24px; height: 24px; fill: none; stroke: #000; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; cursor: pointer; }
   .ig-post-actions .spacer { flex: 1; }
   .ig-post-likes { padding: 0 16px; font-size: 14px; font-weight: 700; margin-bottom: 6px; }
   .ig-post-caption { padding: 0 16px; font-size: 14px; margin-bottom: 6px; }
-  .ig-post-caption b { font-weight: 700; margin-right: 4px; }
+  .ig-post-caption b { font-weight: 700; margin-right: 4px; cursor: pointer; }
   .ig-post-comments { padding: 0 16px; font-size: 14px; color: #8e8e93; margin-bottom: 6px; cursor: pointer;}
-  .ig-post-comment { padding: 0 16px; font-size: 14px; margin-bottom: 4px; }
+  .ig-post-comment { padding: 0 16px; font-size: 14px; margin-bottom: 12px; }
   .ig-post-comment b { font-weight: 700; color: #000; margin-right: 4px; cursor: pointer; }
-  .ig-post-comment b:active { opacity: 0.5; }
+
+  .ig-detail-nav { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 1px solid #efefef; background: #fff;}
+  .ig-detail-nav .back { font-size: 20px; cursor: pointer; width: 24px; }
+  .ig-detail-nav .title { font-size: 16px; font-weight: 700; }
+  .ig-detail-nav .spacer { width: 24px; }
+  .ig-detail-scroll { flex: 1; overflow-y: auto; padding-bottom: 80px; }
   .ig-post-time { padding: 0 16px; font-size: 12px; color: #8e8e93; margin-top: 8px; }
+  
   .ig-tab-bar { position: absolute; bottom: 25px; left: 0; right: 0; height: 50px; background: #fff; border-top: 0.5px solid #e5e5ea; display: flex; justify-content: space-around; align-items: center; z-index: 10; }
   .ig-tab-bar div { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
   .ig-tab-bar svg { width: 24px; height: 24px; fill: none; stroke: #000; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
@@ -479,9 +562,7 @@
   .msg-row.in .msg-bubble { background: #fff; border-top-left-radius: 2px; }
   .msg-row.out .msg-bubble { background: #fee500; border-top-right-radius: 2px; }
   
-  .msg-time { font-size: 11px; color: #666; align-self: flex-end; margin-bottom: 4px; }
-  .msg-row.out .msg-time { margin-right: 6px; }
-  .msg-row.in .msg-time { margin-left: 6px; order: 2; }
+  .msg-time { font-size: 11px; color: #666; white-space: nowrap; }
   
   .kakao-date-divider { text-align: center; margin: 10px 0; }
   .kakao-date-divider span { background: rgba(0,0,0,0.1); color: #444; font-size: 12px; padding: 4px 12px; border-radius: 20px; }
@@ -530,6 +611,21 @@
     </div>
   </div>
 
+  <!-- 顶部通知横幅 (p5) -->
+  <div class="notification-banner" id="kakaoNotification" onclick="openKakaoFromNotification()">
+    <div class="notif-icon">
+      <img src="photos/avator.jpg" alt="avatar">
+      <div class="notif-app-icon">💬</div>
+    </div>
+    <div class="notif-content">
+      <div class="notif-header">
+        <span class="notif-title">乌希酱</span>
+        <span class="notif-time">现在</span>
+      </div>
+      <div class="notif-body">呼......</div>
+    </div>
+  </div>
+
   <!-- 密码解锁层 -->
   <div class="passcode-screen" id="passcodeScreen">
     <div class="passcode-title">输入密码</div>
@@ -546,16 +642,17 @@
   <!-- 桌面层 -->
   <div class="homescreen" id="homescreen">
     <div class="app-grid">
-      <!-- 日历 Widget -->
+      <!-- 日历 Widget (修正比例) -->
       <div class="widget-calendar" id="icon-calendar" onclick="openApp(event, 'calendar')">
-        <div class="wc-header" id="widget-week">星期三</div>
-        <div class="wc-date" id="widget-day">21</div>
-        <div class="wc-event">
-          <div class="wc-event-bar"></div>
-          <div class="wc-event-info">
-            <div class="wc-event-title">勇志轻了 1 kg 纪念日</div>
-            <div class="wc-event-time">全天</div>
-          </div>
+        <div class="wc-title">11월</div>
+        <div class="wc-mini-grid">
+          <span class="header sun">일</span><span class="header">월</span><span class="header">화</span><span class="header">수</span><span class="header">목</span><span class="header">금</span><span class="header">토</span>
+          <span class="sun"></span><span></span><span></span><span></span><span></span><span></span><span>1</span>
+          <span class="sun">2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
+          <span class="sun">9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
+          <span class="sun">16</span><span>17</span><span>18</span><span class="today">19</span><span>20</span><span>21</span><span>22</span>
+          <span class="sun">23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span>
+          <span class="sun">30</span>
         </div>
       </div>
 
@@ -612,6 +709,18 @@
           <div class="badge" style="border-color: #4cd964; background: #ff3b30;">13</div>
         </div>
       </div>
+      
+      <!-- KakaoTalk (新图标) -->
+      <div class="app-icon" id="icon-kakao" onclick="openApp(event, 'kakao')">
+        <div class="dock-icon-kakao">
+          <svg viewBox="0 0 100 100" width="58" height="58">
+            <rect x="0" y="0" width="100" height="100" fill="#fee500" />
+            <path d="M50 25 C 30 25, 18 35, 18 48 C 18 57, 25 65, 35 68 L 30 80 L 42 73 C 45 74, 48 75, 50 75 C 70 75, 82 65, 82 48 C 82 35, 70 25, 50 25 Z" fill="#3c1e1e" />
+          </svg>
+          <div class="badge" style="border-color: #fee500; background: #ff3b30;">18</div>
+        </div>
+      </div>
+
       <!-- Safari -->
       <div class="app-icon" id="icon-safari" onclick="openApp(event, 'safari')">
         <div class="dock-icon-safari">
@@ -629,16 +738,7 @@
           </svg>
         </div>
       </div>
-      <!-- KakaoTalk (新图标) -->
-      <div class="app-icon" id="icon-kakao" onclick="openApp(event, 'kakao')">
-        <div class="dock-icon-kakao">
-          <svg viewBox="0 0 100 100" width="58" height="58">
-            <rect x="0" y="0" width="100" height="100" fill="#fee500" />
-            <path d="M50 25 C 30 25, 18 35, 18 48 C 18 57, 25 65, 35 68 L 30 80 L 42 73 C 45 74, 48 75, 50 75 C 70 75, 82 65, 82 48 C 82 35, 70 25, 50 25 Z" fill="#3c1e1e" />
-          </svg>
-          <div class="badge" style="border-color: #fee500; background: #ff3b30;">18</div>
-        </div>
-      </div>
+
       <!-- 音乐 App -->
       <div class="app-icon" id="icon-music" onclick="openApp(event, 'music')">
         <div class="dock-icon-music">
@@ -650,7 +750,25 @@
 
   <!-- ================= 电话 App ================= -->
   <div class="app-page phone-app" id="app-phone">
-    <div id="phone-list-page" style="display: flex; flex-direction: column; height: 100%;">
+    <!-- 来电页面 (p6) -->
+    <div class="incoming-call-screen" id="incoming-call-screen">
+      <div class="incoming-text">手机</div>
+      <div class="incoming-name">乌希酱</div>
+      <div class="incoming-avatar"></div>
+      <div class="incoming-actions">
+        <div class="incoming-btn decline" onclick="declineCall()">
+          <div class="icon-circle"><svg viewBox="0 0 24 24" width="32" height="32" fill="#fff"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.7l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg></div>
+          <div class="label">拒接</div>
+        </div>
+        <div class="incoming-btn answer" onclick="answerCall()">
+          <div class="icon-circle"><svg viewBox="0 0 24 24" width="32" height="32" fill="#fff"><path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.4-1.2-.6-2.4-.6-3.6 0-.6-.4-1-1-1H4c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"/></svg></div>
+          <div class="label">接听</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 最近通话列表 -->
+    <div class="phone-list-page" id="phone-list-page">
       <div class="phone-list-header">
         <div class="phone-top-bar">
           <div class="back" onclick="closeApp('phone')"><span style="font-size: 10px;">◀</span> 主屏幕</div>
@@ -693,21 +811,48 @@
       <div class="phone-list" id="list-missed"></div>
     </div>
 
+    <!-- 通话中页面 -->
     <div class="call-screen" id="call-screen">
       <div class="call-avatar"></div>
       <div class="call-name-display">乌希酱</div>
       <div class="call-timer" id="call-timer">00:00</div>
+      
       <div class="live-caption" id="live-caption">
         <div class="caption-name" id="caption-name">是温</div>
         <div class="caption-text" id="caption-text">...</div>
       </div>
-      <div class="call-actions">
-        <div class="call-btn"><div class="icon-circle"><svg viewBox="0 0 24 24" width="28" height="28" fill="#fff"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg></div><div class="label">扬声器</div></div>
-        <div class="call-btn"><div class="icon-circle"><svg viewBox="0 0 24 24" width="28" height="28" fill="#fff"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg></div><div class="label">FaceTime</div></div>
-        <div class="call-btn"><div class="icon-circle"><svg viewBox="0 0 24 24" width="28" height="28" fill="#fff"><path d="M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.18l5.98 5.99zM4.27 3L3 4.27l6.01 6.01V11c0 1.66 1.33 3 2.99 3 .22 0 .44-.03.65-.08l1.66 1.66c-.71.33-1.5.52-2.31.52-2.76 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c.91-.13 1.77-.45 2.54-.9L19.73 21 21 19.73 4.27 3z"/></svg></div><div class="label">静音</div></div>
-        <div class="call-btn"><div class="icon-circle"><svg viewBox="0 0 24 24" width="28" height="28" fill="#fff"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div><div class="label">添加通话</div></div>
-        <div class="call-btn end-call" onclick="endCall()"><div class="icon-circle"><svg viewBox="0 0 24 24" width="28" height="28" fill="#fff"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.7l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg></div><div class="label">结束</div></div>
-        <div class="call-btn"><div class="icon-circle"><svg viewBox="0 0 24 24" width="28" height="28" fill="#fff"><circle cx="6" cy="6" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18" cy="12" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="12" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg></div><div class="label">拨号键盘</div></div>
+      
+      <div class="call-actions-wrap">
+        <div class="call-actions">
+          <div class="call-btn">
+            <div class="icon-circle"><svg viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.18l5.98 5.99zM4.27 3L3 4.27l6.01 6.01V11c0 1.66 1.33 3 2.99 3 .22 0 .44-.03.65-.08l1.66 1.66c-.71.33-1.5.52-2.31.52-2.76 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c.91-.13 1.77-.45 2.54-.9L19.73 21 21 19.73 4.27 3z"/></svg></div>
+            <div class="label">静音</div>
+          </div>
+          <div class="call-btn">
+            <div class="icon-circle"><svg viewBox="0 0 24 24" width="24" height="24" fill="#fff"><circle cx="6" cy="6" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18" cy="12" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="12" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg></div>
+            <div class="label">拨号键盘</div>
+          </div>
+          <div class="call-btn">
+            <div class="icon-circle"><svg viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg></div>
+            <div class="label">扬声器</div>
+          </div>
+          <div class="call-btn">
+            <div class="icon-circle"><svg viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div>
+            <div class="label">添加通话</div>
+          </div>
+          <div class="call-btn">
+            <div class="icon-circle"><svg viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg></div>
+            <div class="label">FaceTime</div>
+          </div>
+          <div class="call-btn">
+            <div class="icon-circle"><svg viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+            <div class="label">联系人</div>
+          </div>
+        </div>
+        
+        <div class="call-btn-end" onclick="endCall()">
+          <svg viewBox="0 0 24 24" width="32" height="32" fill="#fff"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.7l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg>
+        </div>
       </div>
     </div>
   </div>
@@ -741,7 +886,7 @@
       <div class="back" onclick="closeApp('photos')"><span style="font-size: 10px;">◀</span> 主屏幕</div>
     </div>
     <div class="ph-header">
-      <div><h1>图库</h1><div class="count">12 张照片</div></div>
+      <div><h1>图库</h1><div class="count">48 张照片</div></div>
       <div class="select-btn">选择</div>
     </div>
     <div class="ph-scroll-area">
@@ -816,6 +961,15 @@
       <div class="safari-nav">
         <div class="back" onclick="closeApp('safari')"><span style="font-size: 10px;">◀</span> 主屏幕</div>
       </div>
+      
+      <!-- 移动到顶部的搜索栏 -->
+      <div class="safari-top-search">
+        <div class="safari-search-bar" onclick="openSafariSearch()">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="#8e8e93"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          <span class="search-text">搜索或输入网站名称</span>
+        </div>
+      </div>
+
       <div class="safari-home-content">
         <div class="safari-section-title">个人收藏</div>
         <div class="safari-favorites" id="safariFavorites"></div>
@@ -827,12 +981,9 @@
         <div class="safari-section-title">阅读列表</div>
         <div class="safari-reading-list">阅读列表为空</div>
       </div>
-      <div class="safari-toolbar">
-        <div class="safari-search-bar" onclick="openSafariSearch()">
-          <span style="width: 16px;"></span>
-          <span class="search-text">搜索或输入网站名称</span>
-          <span style="width: 16px;"></span>
-        </div>
+
+      <!-- 底部只保留图标 -->
+      <div class="safari-bottom-bar">
         <div class="safari-bottom-icons">
           <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
           <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
@@ -863,6 +1014,7 @@
 
   <!-- ================= Instagram App ================= -->
   <div class="app-page ig-app" id="app-instagram">
+    <!-- ohocean 个人主页 -->
     <div class="ig-page active" id="ig-page-ohocean">
       <div class="ig-nav-bar">
         <div class="username-top">ohocean ▾</div>
@@ -895,14 +1047,16 @@
         <div class="ig-grid" id="ohocean-grid"></div>
       </div>
       <div class="ig-tab-bar">
-        <div class="active"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <div onclick="openIgFeed()"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
         <div><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
-        <div class="user-tab">
+        <!-- ohocean 主页底部头像 -->
+        <div class="user-tab active" onclick="switchIgPage('ohocean')">
           <img src="photos/ohocean-avatar.jpg" onerror="this.style.display='none';this.parentNode.innerHTML='o'">
         </div>
       </div>
     </div>
 
+    <!-- tokubezunou 个人主页 -->
     <div class="ig-page" id="ig-page-tokubezunou">
       <div class="ig-nav-bar">
         <div class="username-top">tokubezunou ▾</div>
@@ -934,14 +1088,44 @@
         <div class="ig-grid" id="tokubezunou-grid"></div>
       </div>
       <div class="ig-tab-bar">
-        <div class="active"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <div onclick="openIgFeed()"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
         <div><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
-        <div class="user-tab">
+        <!-- tokubezunou 主页底部头像 -->
+        <div class="user-tab active" onclick="switchIgPage('tokubezunou')">
            <img src="photos/tokubezunou-avatar.jpg" onerror="this.style.display='none';this.parentNode.innerHTML='y'">
         </div>
       </div>
     </div>
 
+    <!-- Feed 主页 (点击小房子后进入) -->
+    <div class="ig-page" id="ig-page-feed">
+      <div class="ig-feed-header">
+        <div class="left">
+          <div class="sm-avatar">
+            <img id="feed-user-avatar" src="" onerror="this.style.display='none';">
+          </div>
+          <div class="name" id="feed-username"></div>
+        </div>
+        <div class="top-icons">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+      </div>
+      
+      <div class="ig-feed-scroll" id="ig-feed-container">
+        <!-- 动态生成的帖子 -->
+      </div>
+
+      <div class="ig-tab-bar">
+        <div class="active"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <div><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+        <!-- Feed 页面底部头像 -->
+        <div class="user-tab" id="feed-user-tab">
+          <img src="" onerror="this.style.display='none';">
+        </div>
+      </div>
+    </div>
+
+    <!-- 帖子详情页 -->
     <div class="ig-page" id="ig-page-post">
       <div class="ig-detail-nav">
         <div class="back" onclick="closeIgPost()">‹</div>
@@ -1036,7 +1220,7 @@
   <!-- ================= KakaoTalk App ================= -->
   <div class="app-page kakao-app" id="app-kakao">
     
-    <!-- 聊天列表页 (P3) -->
+    <!-- 聊天列表页 -->
     <div class="kakao-page active" id="kakao-list-page">
       <div class="kakao-list-header">
         <div class="kakao-top-bar">
@@ -1062,7 +1246,7 @@
             <div class="kakao-name">乌希酱</div>
             <div class="kakao-msg-preview">呼......</div>
           </div>
-          <div class="kakao-time">21:29</div>
+          <div class="kakao-time">下午 2:45</div>
         </div>
 
         <div class="kakao-chat-item">
@@ -1101,42 +1285,6 @@
           <div class="kakao-time">昨天</div>
         </div>
 
-        <div class="kakao-chat-item">
-          <div class="kakao-avatar" style="background:#b2c7d9; color:#fff;"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
-          <div class="kakao-info">
-            <div class="kakao-name">小顺同学家长 3</div>
-            <div class="kakao-msg-preview">1</div>
-          </div>
-          <div class="kakao-time">昨天</div>
-        </div>
-
-        <div class="kakao-chat-item">
-          <div class="kakao-avatar" style="background:#b2c7d9; color:#fff;"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
-          <div class="kakao-info">
-            <div class="kakao-name">小顺同学家长 4</div>
-            <div class="kakao-msg-preview">1</div>
-          </div>
-          <div class="kakao-time">昨天</div>
-        </div>
-
-        <div class="kakao-chat-item">
-          <div class="kakao-avatar" style="background:#b2c7d9; color:#fff;"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
-          <div class="kakao-info">
-            <div class="kakao-name">小顺同学家长 5</div>
-            <div class="kakao-msg-preview">1</div>
-          </div>
-          <div class="kakao-time">昨天</div>
-        </div>
-
-        <div class="kakao-chat-item">
-          <div class="kakao-avatar" style="background:#b2c7d9; color:#fff;"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
-          <div class="kakao-info">
-            <div class="kakao-name">小顺同学家长 6</div>
-            <div class="kakao-msg-preview">1</div>
-          </div>
-          <div class="kakao-time">昨天</div>
-        </div>
-
       </div>
 
       <div class="kakao-tabbar">
@@ -1148,7 +1296,7 @@
       </div>
     </div>
 
-    <!-- 聊天详情页 (P4) -->
+    <!-- 聊天详情页 -->
     <div class="kakao-chat-screen" id="kakao-chat-screen">
       <div class="kakao-chat-header">
         <div class="back" onclick="closeKakaoChat()">‹</div>
@@ -1284,6 +1432,16 @@
       lockscreen.style.display = 'none';
       document.getElementById('homescreen').style.display = 'flex';
       renderCalendar(); 
+      
+      // 解锁后延迟弹出通知
+      setTimeout(() => {
+        document.getElementById('kakaoNotification').classList.add('show');
+        // 4秒后收回
+        setTimeout(() => {
+          document.getElementById('kakaoNotification').classList.remove('show');
+        }, 4000);
+      }, 1000);
+
     }, 400);
   }
 
@@ -1292,7 +1450,7 @@
   const schedules = {
     6:  ["小顺数学考试"],
     12: ["兔子嘉年华"],
-    21: ["勇志轻了 1 kg 纪念日"],
+    21: ["勇志减肥 1 kg 纪念日"],
     23: ["洗衣店优惠"],
     31: ["和勇志小顺出游！重要！"]
   };
@@ -1329,11 +1487,7 @@
     eventsContainer.innerHTML = html;
   }
   function updateWidget(day) {
-    document.getElementById('widget-day').textContent = day;
-    const daySchedules = schedules[day] || [];
-    const titleEl = document.querySelector('.wc-event-title');
-    if (daySchedules.length > 0) titleEl.textContent = daySchedules[0];
-    else titleEl.textContent = '今日无日程';
+    // 静态月历，无需更新
   }
   function selectToday() { selectDay(TODAY); }
 
@@ -1462,6 +1616,16 @@
     document.getElementById('tab-missed').classList.toggle('active', tab === 'missed');
     document.getElementById('list-all').classList.toggle('active', tab === 'all');
     document.getElementById('list-missed').classList.toggle('active', tab === 'missed');
+  }
+
+  function answerCall() {
+    document.getElementById('incoming-call-screen').classList.remove('active');
+    startCall();
+  }
+
+  function declineCall() {
+    document.getElementById('incoming-call-screen').classList.remove('active');
+    document.getElementById('phone-list-page').style.display = 'flex';
   }
 
   function startCall() {
@@ -1594,7 +1758,7 @@
       posts: [
         { img: 'photos/ohocean-post1.jpg', likes: 5, commentAuthor: 'tokubezunou', comment: 'kkk' },
         { img: 'photos/ohocean-post2.jpg', likes: 4, commentAuthor: 'tokubezunou', comment: '❤️' },
-        { img: 'photos/ohocean-post3.jpg', likes: 9, commentAuthor: 'tokubezunou', comment: 'loveee you' }
+        { img: 'photos/ohocean-post3.jpg', likes: 9, commentAuthor: 'tokubezunou', comment: 'lovee you' }
       ]
     },
     tokubezunou: {
@@ -1635,6 +1799,52 @@
     document.getElementById('ig-page-' + pageName).classList.add('active');
   }
 
+  function openIgFeed() {
+    const myName = currentViewUser;
+    const friendName = myName === 'ohocean' ? 'tokubezunou' : 'ohocean';
+    
+    const myData = igData[myName];
+    const friendData = igData[friendName];
+
+    document.getElementById('feed-user-avatar').src = myData.avatar;
+    document.getElementById('feed-username').textContent = myData.name;
+    
+    // 动态更新 Feed 页面底部 Tab 的头像及点击事件
+    const tab = document.getElementById('feed-user-tab');
+    tab.innerHTML = `<img src="${myData.avatar}" onerror="this.style.display='none'">`;
+    tab.onclick = () => switchIgPage(myName);
+    document.querySelector('.ig-feed-header .left').onclick = () => switchIgPage(myName);
+
+    const feedContainer = document.getElementById('ig-feed-container');
+    feedContainer.innerHTML = friendData.posts.map(post => `
+      <div class="ig-post">
+        <div class="ig-post-header" onclick="switchIgPage('${friendData.name}')">
+          <div class="sm-avatar">
+            <img src="${friendData.avatar}" onerror="this.style.display='none'">
+          </div>
+          <div class="name">${friendData.name}</div>
+          <div class="dots">•••</div>
+        </div>
+        <img class="ig-post-main-img" src="${post.img}">
+        <div class="ig-post-actions">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <div class="spacer"></div>
+          <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="ig-post-likes">좋아요 ${post.likes}개</div>
+        <div class="ig-post-caption"><b onclick="switchIgPage('${friendData.name}')">${friendData.name}</b> </div>
+        <div class="ig-post-comments">댓글 모두 보기</div>
+        <div class="ig-post-comment">
+          <b onclick="switchIgPage('${post.commentAuthor}')">${post.commentAuthor}</b> <span>${post.comment}</span>
+        </div>
+      </div>
+    `).join('');
+
+    switchIgPage('feed');
+  }
+
   function openIgPost(user, postIndex) {
     currentPostContext = { user: user, index: postIndex };
     const data = igData[user];
@@ -1668,25 +1878,25 @@
   const memoData = [
     {
       title: "这个小顺",
-      content: "这个小顺怎么这样。啊，这里是我的日记。是日记用着吧。总之，今天小顺让我很生气，怎么又把玩具丢地上不捡呢。说实话，他跟勇志根本一模一样嘛。也不知道那小小脑袋在想什么。所以我就装作很凶地骂他。我说‘我不会再买甜食回家了’。结果小顺一点也没有害怕。一点也没有！还一脸不相信的样子，真的，完全更生气了。小顺说‘是温爸比不可能不买甜食，是温爸比吃最多‘...... 好像真的是这样。啊，我的管教真的，哼。而且勇志还在偷偷笑，真的，太过分了。",
+      content: "这个小顺怎么这样。啊，这里是我的日记。当时日记用着吧。总之，今天小顺让我很生气，怎么又把玩具丢地上不捡呢。说实话，他跟勇志根本一模一样嘛。也不知道那小小脑袋在想什么。所以我就装作很凶地骂他。我说「我不会再买甜食回家了」。结果小顺一点也没有害怕。一点也没有！还一脸不相信的样子，真的，完全更生气了。小顺说「是温爸比不可能不买甜食，是温爸比吃最多」...... 好像真的是这样。啊，我的管教真的，哼。而且勇志还在偷偷笑，真的，太过分了。",
       date: "2026年10月16日",
       pinned: true
     },
     {
       title: "勇志笨蛋",
-      content: "最近一直在思考。勇志真的好笨。为什么会找了一个这么笨的伴侣。难道我特别喜欢笨蛋吗？今天提早吧我给他买的惊喜给拆开了...... 完全没 sense啊。怎么可能不知道不能拆惊喜呢。后来他说’我不知道这是惊喜啊‘，那更笨了。笨蛋 —— 得能勇志大笨蛋。",
+      content: "最近一直在思考。勇志真的好笨。为什么会找了一个这么笨的伴侣。难道我特别喜欢笨蛋吗？今天提早吧我给他买的惊喜给拆开了...... 完全没 sense啊。怎么可能不知道不能拆惊喜呢。后来他说「我不知道这是惊喜啊」，那更笨了。笨蛋 —— 得能勇志大笨蛋。",
       date: "2026年10月15日",
       pinned: true
     },
     {
       title: "什么啊",
-      content: "（这是勇志留下的便利贴）什么笨蛋，你才是笨蛋，吴是温笨蛋。真的不知道嘛。谁会把惊喜放在桌子上？上面还写着’打开它‘。",
+      content: "（这是勇志留下的便利贴）什么笨蛋，你才是笨蛋，吴是温笨蛋。真的不知道嘛。谁会把惊喜放在桌子上？上面还写着「打开他」。",
       date: "2026年10月15日",
       pinned: true
     },
     {
       title: "吃什么好",
-      content: "吃什么好呢...... 勇志最近想吃的咖啡店太远了。小顺能走这么远吗。不是质疑小顺，只是。嗯，小顺还小嘛，可能会在咖啡店哭泣吵闹...... 但是，因为勇志很喜欢，所以还是打算去了。（更新：不去了！跟勇志说’一起去咖啡店吧‘他说’啊...... 不想动....... 留在家吧‘，小顺在旁边附和’对呀对呀，在家吧！‘我真的，该拿他们怎么办啊！可恶）",
+      content: "吃什么好呢...... 勇志最近想吃的咖啡店太远了。小顺能走这么远吗。不是质疑小顺，只是。嗯，小顺还小嘛，可能会在咖啡店哭泣吵闹...... 但是，因为勇志很喜欢，所以还是打算去了。（更新：不去了！跟勇志说「一起去咖啡店吧」他说「啊...... 不想动....... 留在家吧」，小顺在旁边附和「对呀对呀，在家吧！」我真的，该拿他们怎么办啊！可恶）",
       date: "2026年10月14日",
       pinned: false
     },
@@ -1698,7 +1908,7 @@
     },
     {
       title: "好累啊",
-      content: "好累啊。绕着家附近的运动场跑了 3 圈。没想到会这么累啊。勇志在我旁边真的，快死掉了。我们的体力怎么这么弱？感觉是因为小顺出生了，所以。在那个时候消耗了很多呢。所以小顺才跑得这么溜啊。把我和勇志的精力都拿走了。",
+      content: "好累啊。绕着家附近的运动场跑了 3 圈。没想到会这么累啊。勇志在我旁边真的，快死掉了。我们的体力怎么这么弱？感觉是因为小顺出生了，所以。在那个时候消耗了很多呢。所以小顺才拍得这么溜呢。把我和勇志的精力都拿走了。",
       date: "2026年10月10日",
       pinned: false
     },
@@ -1760,53 +1970,52 @@
   function initKakaoChat() {
     const area = document.getElementById('kakao-msgs-area');
 
-    // 按照你提供的顺序与简体字更新
     const chatScript = [
       { type: 'in',  text: '好累啊好累啊，好累啊。' },
       { type: 'out', text: '不是在上班吗？kkkkk' },
       { type: 'in',  text: '哥哥，真的，我不要上班了。' },
-      { type: 'out', text: '好啊。我养你吧。' },
+      { type: 'out', text: '好啊。我养你吧。', time: '下午 1:15' },
       { type: 'in',  text: '你要好好照顾小顺喔。' },
       { type: 'in',  text: '开玩笑的。我还要继续上班。' },
-      { type: 'in',  text: '很喜欢我的工作，kkk' },
+      { type: 'in',  text: '很喜欢我的工作，kkk', time: '下午 1:20' },
       { type: 'out', text: '上班上疯了吗' },
       { type: 'out', text: '为什么可以用电话？？' },
       { type: 'out', text: '老板呢' },
-      { type: 'out', text: '不在吗' },
+      { type: 'out', text: '不在吗', time: '下午 1:22' },
       { type: 'in',  text: '在啊，就在我前面呢' },
       { type: 'in',  text: '我现在在装作很认真' },
       { type: 'in',  text: '眉头都黏在一起了' },
-      { type: 'in',  text: 'kkk' },
+      { type: 'in',  text: 'kkk', time: '下午 1:25' },
       { type: 'out', text: '你的那个帅哥同事呢' },
-      { type: 'out', text: '还在吗' },
+      { type: 'out', text: '还在吗', time: '下午 1:28' },
       { type: 'in',  text: '在啊' },
-      { type: 'in',  text: '很帅气呢' },
+      { type: 'in',  text: '很帅气呢', time: '下午 1:30' },
       { type: 'out', text: '？？？' },
       { type: 'out', text: '快收回这句话吧' },
       { type: 'out', text: '我在做拉面' },
       { type: 'out', text: '给你倒超级无敌辣' },
-      { type: 'out', text: '太生气了' },
+      { type: 'out', text: '太生气了', time: '下午 1:35' },
       { type: 'in',  text: '对不起' },
       { type: 'in',  text: '拉面不要超级辣' },
-      { type: 'in',  text: '是温不要超级气' },
+      { type: 'in',  text: '是温不要超级气', time: '下午 1:38' },
       { type: 'out', text: '因为可爱' },
       { type: 'out', text: '这次就原谅了' },
-      { type: 'out', text: '刚刚把小顺接回家了' },
-      { type: 'in',  text: '我可以跟小顺说说话吗？' },
+      { type: 'out', text: '刚刚把小顺接回家了', time: '下午 1:45' },
+      { type: 'in',  text: '我可以跟小顺说说话吗？', time: '下午 1:46' },
       { type: 'out', text: '不行' },
       { type: 'out', text: '只可以跟我说话' },
-      { type: 'out', text: '小顺还不会用电话呢' },
-      { type: 'in',  text: '啊 给她随便按点东西嘛' },
-      { type: 'out', text: 'Difivdvnsdvfd' },
+      { type: 'out', text: '小顺还不会用电话呢', time: '下午 1:48' },
+      { type: 'in',  text: '啊 给她随便按点东西嘛', time: '下午 1:50' },
+      { type: 'out', text: 'Difivdvnsdvfd', time: '下午 1:51' },
       { type: 'in',  text: 'Kkkkkkkkkk' },
-      { type: 'in',  text: '啊 好可爱 呜呜 ;;' },
-      { type: 'out', text: '我也很可爱啊' },
+      { type: 'in',  text: '啊 好可爱 呜呜 ;;', time: '下午 1:52' },
+      { type: 'out', text: '我也很可爱啊', time: '下午 1:55' },
       { type: 'in',  text: '是温哥最可爱' },
-      { type: 'in',  text: '呵呵' },
-      { type: 'out', text: '我好想你 快点辞职吧' },
-      { type: 'in',  text: '嗯嗯 我也想你 现在递上辞职信吧？' },
+      { type: 'in',  text: '呵呵', time: '下午 1:56' },
+      { type: 'out', text: '我好想你 快点辞职吧', time: '下午 2:00' },
+      { type: 'in',  text: '嗯嗯 我也想你 现在递上辞职信吧？', time: '下午 2:02' },
       { type: 'out', text: 'Kkkkkk' },
-      { type: 'out', text: '加油勇志' },
+      { type: 'out', text: '加油勇志', time: '下午 2:05' },
       { type: 'in',  text: '啊 老板在看我' },
       { type: 'in',  text: '走过来了' },
       { type: 'in',  text: '要看萤幕了' },
@@ -1817,41 +2026,51 @@
       { type: 'in',  text: '谢谢你的时间' },
       { type: 'in',  text: '会把事情都做好的' },
       { type: 'in',  text: '嗯嗯' },
-      { type: 'in',  text: '我会帮忙沟通了' },
+      { type: 'in',  text: '我会帮忙沟通了', time: '下午 2:10' },
       { type: 'out', text: '合作愉快' },
       { type: 'out', text: '对了' },
-      { type: 'out', text: '希望老板对我的客户好一点' },
-      { type: 'in',  text: '呼......' }
+      { type: 'out', text: '希望老板对我的客户好一点', time: '下午 2:15' },
+      { type: 'in',  text: '呼......', time: '下午 2:45' }
     ];
 
     let html = '';
-    let lastType = null;
 
-    chatScript.forEach(item => {
+    for (let i = 0; i < chatScript.length; i++) {
+      const item = chatScript[i];
+      const nextItem = chatScript[i + 1];
+
+      const isLastInGroup = !nextItem || nextItem.type !== item.type;
+      const timeText = isLastInGroup ? (item.time || '下午 2:45') : '';
+
       if (item.type === 'in') {
-        const showHeader = lastType !== 'in';
+        const showHeader = i === 0 || chatScript[i-1].type !== 'in';
         html += `
-          <div class="msg-row in">
+          <div class="msg-row in" style="margin-bottom: 4px;">
             ${showHeader
               ? `<div class="avatar"><img src="photos/avator.jpg" onerror="this.style.display='none';this.parentNode.innerHTML='👤'"></div>`
               : `<div style="width:40px; flex-shrink:0;"></div>`}
             <div class="content">
               ${showHeader ? `<div class="name">乌希酱</div>` : ''}
-              <div class="msg-bubble">${item.text}</div>
+              <div style="display:flex; align-items:flex-end; gap:4px;">
+                <div class="msg-bubble">${item.text}</div>
+                ${timeText ? `<div class="msg-time">${timeText}</div>` : ''}
+              </div>
             </div>
           </div>
         `;
       } else {
         html += `
-          <div class="msg-row out">
+          <div class="msg-row out" style="margin-bottom: 4px;">
             <div class="content">
-              <div class="msg-bubble">${item.text}</div>
+              <div style="display:flex; align-items:flex-end; gap:4px;">
+                 ${timeText ? `<div class="msg-time">${timeText}</div>` : ''}
+                 <div class="msg-bubble">${item.text}</div>
+              </div>
             </div>
           </div>
         `;
       }
-      lastType = item.type;
-    });
+    }
 
     area.innerHTML = html;
     setTimeout(() => {
@@ -1876,14 +2095,27 @@
     document.getElementById('kakao-list-page').classList.add('active');
   }
 
+  // 点击通知栏跳转 Kakaotalk 聊天室的专属函数
+  function openKakaoFromNotification() {
+    document.getElementById('kakaoNotification').classList.remove('show');
+    const kakaoIcon = document.getElementById('icon-kakao');
+    // 传入元素触发放大动画
+    openApp(kakaoIcon, 'kakao');
+    // 等待 450ms 动画结束后，跳转到聊天室详情页
+    setTimeout(() => {
+      openKakaoChat();
+    }, 450);
+  }
+
   // --- 13. 通用 App 动画控制 ---
   const globalTime = document.getElementById('globalTime');
   const icons = document.querySelectorAll('.status-icons svg');
   const globalHomeBar = document.getElementById('globalHomeBar');
 
-  function openApp(event, appName) {
+  // 修改了传入的参数，以兼容直接传 DOM 元素（供通知栏调用）
+  function openApp(eventOrElement, appName) {
     const appEl = document.getElementById('app-' + appName);
-    const iconEl = event.currentTarget;
+    const iconEl = eventOrElement.currentTarget || eventOrElement; 
 
     if (appEl && iconEl) {
       const iconRect = iconEl.getBoundingClientRect();
@@ -1905,7 +2137,8 @@
       }
       
       if(appName === 'phone') {
-        document.getElementById('phone-list-page').style.display = 'flex';
+        document.getElementById('incoming-call-screen').classList.add('active');
+        document.getElementById('phone-list-page').style.display = 'none';
         document.getElementById('call-screen').classList.remove('active');
         switchCallTab('all'); 
       }
@@ -1936,6 +2169,10 @@
     if (appEl && iconEl) {
       if (appName === 'phone' && document.getElementById('call-screen').classList.contains('active')) {
         endCall();
+      }
+      
+      if (appName === 'phone') {
+        document.getElementById('incoming-call-screen').classList.remove('active');
       }
 
       const iconRect = iconEl.getBoundingClientRect();
