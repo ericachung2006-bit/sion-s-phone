@@ -1325,6 +1325,8 @@
 
   <!-- 隐藏的音频播放器 -->
   <audio id="audioPlayer"></audio>
+  <!-- 通话背景音乐 -->
+  <audio id="callBgm" src="music/call-bgm.mp3" loop></audio>
 
 </div>
 
@@ -1635,6 +1637,13 @@
     document.querySelectorAll('.status-icons svg').forEach(svg => svg.style.fill = '#fff');
     document.getElementById('globalHomeBar').classList.remove('dark'); 
     
+    // 播放背景音乐
+    const bgm = document.getElementById('callBgm');
+    if (bgm) {
+      bgm.currentTime = 0;
+      bgm.play().catch(e => console.log("请确保背景音乐文件存在"));
+    }
+
     callSeconds = 0;
     document.getElementById('call-timer').textContent = '00:00';
     if (callTimerInterval) clearInterval(callTimerInterval);
@@ -1653,42 +1662,43 @@
     const captionName = document.getElementById('caption-name');
     const captionText = document.getElementById('caption-text');
     
+    // 台词停留时间已改为中间值
     const script = [
-      { name: '是温', text: '喂', delay: 1500 },
-      { name: '勇志', text: '喂喂，喂喂', delay: 2000 },
-      { name: '是温', text: '干嘛一直给我打电话呢？10 通未接来电啊。', delay: 3500 },
-      { name: '勇志', text: '为什么不接我电话......', delay: 2500 },
-      { name: '是温', text: '车上人超级超级多。啊，有汗味。', delay: 3500 },
-      { name: '勇志', text: '嘘...... 旁边的人会听到的吧？', delay: 2500 },
-      { name: '是温', text: '嘿嘿嘿我现在说话像蚊子一样。', delay: 3000 },
-      { name: '勇志', text: '啊，给我一个啵啵。', delay: 2500 },
-      { name: '是温', text: '这个的话不行。', delay: 2000 },
-      { name: '勇志', text: '啊啊。不是说像蚊子吗？', delay: 2500 },
-      { name: '是温', text: '啵啵的声音那得有多大啊？？', delay: 3000 },
-      { name: '勇志', text: '嘿嘿。', delay: 1500 },
-      { name: '是温', text: '在家等我吧，我快回来了喔。', delay: 3000 },
-      { name: '勇志', text: '特别特别想你。', delay: 2500 },
-      { name: '是温', text: '啊，不小心开免提了，大家都看着我......', delay: 3500 },
-      { name: '勇志', text: '挺好的，这样就不会有人搭讪你了。', delay: 3000 },
-      { name: '是温', text: '啊，不好意思（在跟别人说话）', delay: 2500 },
-      { name: '勇志', text: '？？？？', delay: 1500 },
-      { name: '是温', text: '对对，就这样转左...... 对对。', delay: 3000 },
-      { name: '勇志', text: '什么啊。是大帅哥吗？', delay: 2500 },
-      { name: '是温', text: '？？就普通老婆婆啦。', delay: 2500 },
-      { name: '勇志', text: '连小顺都在盯着你了。', delay: 2500 },
-      { name: '是温', text: '你说谎呢？小顺这个时间一定在睡觉好嘛。', delay: 3500 },
-      { name: '勇志', text: '……我好想你。都打 10 通电话了。', delay: 3500 },
-      { name: '是温', text: '是啊。', delay: 1500 },
-      { name: '勇志', text: '你怎么就不懂我的心啊。', delay: 2500 },
-      { name: '是温', text: '说什么呢，我现在刚下车，现在正在跑着。', delay: 3500 },
-      { name: '勇志', text: '跑回家吗？做得好。', delay: 2500 },
-      { name: '是温', text: '不说了。你也不想我在街上跌倒吧？？', delay: 3000 },
-      { name: '勇志', text: '就算不跟我讲电话也会跌倒啊。', delay: 3000 },
-      { name: '是温', text: '哼，才不会。不说了拜拜乌希酱～', delay: 3500 },
-      { name: '勇志', text: '乌希？？', delay: 1500 },
-      { name: '是温', text: '嘻。我想你。拜拜。', delay: 2500 },
-      { name: '勇志', text: '啊。我爱你。', delay: 2000 },
-      { name: '是温', text: '（啵！', delay: 2000 }
+      { name: '是温', text: '喂', delay: 1200 },
+      { name: '勇志', text: '喂喂，喂喂', delay: 1800 },
+      { name: '是温', text: '干嘛一直给我打电话呢？10 通未接来电啊。', delay: 2500 },
+      { name: '勇志', text: '为什么不接我电话......', delay: 2000 },
+      { name: '是温', text: '车上人超级超级多。啊，有汗味。', delay: 2500 },
+      { name: '勇志', text: '嘘...... 旁边的人会听到的吧？', delay: 2000 },
+      { name: '是温', text: '嘿嘿嘿我现在说话像蚊子一样。', delay: 2200 },
+      { name: '勇志', text: '啊，给我一个啵啵。', delay: 1800 },
+      { name: '是温', text: '这个的话不行。', delay: 1500 },
+      { name: '勇志', text: '啊啊。不是说像蚊子吗？', delay: 1800 },
+      { name: '是温', text: '啵啵的声音那得有多大啊？？', delay: 2200 },
+      { name: '勇志', text: '嘿嘿。', delay: 1200 },
+      { name: '是温', text: '在家等我吧，我快回来了喔。', delay: 2200 },
+      { name: '勇志', text: '特别特别想你。', delay: 1800 },
+      { name: '是温', text: '啊，不小心开免提了，大家都看着我......', delay: 2500 },
+      { name: '勇志', text: '挺好的，这样就不会有人搭讪你了。', delay: 2200 },
+      { name: '是温', text: '啊，不好意思（在跟别人说话）', delay: 1800 },
+      { name: '勇志', text: '？？？？', delay: 1000 },
+      { name: '是温', text: '对对，就这样转左...... 对对。', delay: 2000 },
+      { name: '勇志', text: '什么啊。是大帅哥吗？', delay: 1800 },
+      { name: '是温', text: '？？就普通老婆婆啦。', delay: 1800 },
+      { name: '勇志', text: '连小顺都在盯着你了。', delay: 1800 },
+      { name: '是温', text: '你说谎呢？小顺这个时间一定在睡觉好嘛。', delay: 2500 },
+      { name: '勇志', text: '……我好想你。都打 10 通电话了。', delay: 2200 },
+      { name: '是温', text: '是啊。', delay: 1200 },
+      { name: '勇志', text: '你怎么就不懂我的心啊。', delay: 2000 },
+      { name: '是温', text: '说什么呢，我现在刚下车，现在正在跑着。', delay: 2500 },
+      { name: '勇志', text: '跑回家吗？做得好。', delay: 1800 },
+      { name: '是温', text: '不说了。你也不想我在街上跌倒吧？？', delay: 2200 },
+      { name: '勇志', text: '就算不跟我讲电话也会跌倒啊。', delay: 2000 },
+      { name: '是温', text: '哼，才不会。不说了拜拜乌希酱～', delay: 2200 },
+      { name: '勇志', text: '乌希？？', delay: 1200 },
+      { name: '是温', text: '嘻。我想你。拜拜。', delay: 1800 },
+      { name: '勇志', text: '啊。我爱你。', delay: 1500 },
+      { name: '是温', text: '（啵！', delay: 1500 }
     ];
 
     callFlowTimeouts.forEach(clearTimeout);
@@ -1710,6 +1720,14 @@
   function endCall() {
     if (callTimerInterval) clearInterval(callTimerInterval);
     callFlowTimeouts.forEach(clearTimeout);
+    
+    // 停止背景音乐
+    const bgm = document.getElementById('callBgm');
+    if (bgm) {
+      bgm.pause();
+      bgm.currentTime = 0;
+    }
+
     document.getElementById('live-caption').classList.remove('show');
     document.getElementById('call-screen').classList.remove('active');
     document.getElementById('phone-list-page').style.display = 'flex';
@@ -2099,9 +2117,7 @@
   function openKakaoFromNotification() {
     document.getElementById('kakaoNotification').classList.remove('show');
     const kakaoIcon = document.getElementById('icon-kakao');
-    // 传入元素触发放大动画
     openApp(kakaoIcon, 'kakao');
-    // 等待 450ms 动画结束后，跳转到聊天室详情页
     setTimeout(() => {
       openKakaoChat();
     }, 450);
@@ -2112,7 +2128,6 @@
   const icons = document.querySelectorAll('.status-icons svg');
   const globalHomeBar = document.getElementById('globalHomeBar');
 
-  // 修改了传入的参数，以兼容直接传 DOM 元素（供通知栏调用）
   function openApp(eventOrElement, appName) {
     const appEl = document.getElementById('app-' + appName);
     const iconEl = eventOrElement.currentTarget || eventOrElement; 
